@@ -17,7 +17,7 @@ def load_vsfc_split(split_path):
         topics = f.read().splitlines()
 
     # Check line number
-    assert len(sents) == len(sentiments) == len(topics), "⚠️ Số dòng không khớp giữa 3 file!"
+    assert len(sents) == len(sentiments) == len(topics), " Số dòng không khớp giữa 3 file!"
 
     # Create DataFrame
     df = pd.DataFrame({
