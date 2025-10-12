@@ -1,3 +1,7 @@
 /data/processed
 src/features/.ipynb_checkpoints/build_features-checkpoint.py
 notebooks/.ipynb_checkpoints/02_build_features.ipynb-checkpoint.ipynb
+/data/features
+/models
+notebooks/.ipynb_checkpoints/03_tfidf_perform-checkpoint.ipynb
+src/features/.ipynb_checkpoints/build_tfidf_features-checkpoint.py
