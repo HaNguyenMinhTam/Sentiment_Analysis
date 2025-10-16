@@ -5,3 +5,5 @@ notebooks/.ipynb_checkpoints/02_build_features.ipynb-checkpoint.ipynb
 /models
 notebooks/.ipynb_checkpoints/03_tfidf_perform-checkpoint.ipynb
 src/features/.ipynb_checkpoints/build_tfidf_features-checkpoint.py
+notebooks/.ipynb_checkpoints/04_word2vec_perform-checkpoint.ipynb
+src/features/.ipynb_checkpoints/build_word2vec_features-checkpoint.py
