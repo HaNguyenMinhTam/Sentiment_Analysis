@@ -32,12 +32,16 @@ def main():
     X_test_tfidf  = vectorizer.transform(X_test)
 
     # --- 7️ Lưu vectorizer ---
-    joblib.dump(vectorizer, "D:/Projects/Sentiment_Analysis/models/tfidf_vectorizer.pkl")
+    joblib.dump(train_df["sentiment"].values, os.path.join(LABEL_DIR, "y_train.pkl"))
+    joblib.dump(dev_df["sentiment"].values, os.path.join(LABEL_DIR, "y_dev.pkl"))
+    joblib.dump(test_df["sentiment"].values, os.path.join(LABEL_DIR, "y_test.pkl"))
 
     # --- 8️ Lưu ma trận TF-IDF dạng nén ---
     scipy.sparse.save_npz("D:/Projects/Sentiment_Analysis/data/features/X_train_tfidf.npz", X_train_tfidf)
     scipy.sparse.save_npz("D:/Projects/Sentiment_Analysis/data/features/X_dev_tfidf.npz", X_dev_tfidf)
     scipy.sparse.save_npz("D:/Projects/Sentiment_Analysis/data/features/X_test_tfidf.npz", X_test_tfidf)
+
+    joblib.dump(vectorizer, os.path.join(LABEL_DIR, "tfidf_vectorizer.pkl"))
 
     print(" TF-IDF vectorizer và ma trận TF-IDF đã được lưu thành công!")
 
