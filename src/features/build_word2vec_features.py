@@ -46,8 +46,13 @@ X_test_w2v = np.array([get_sentence_vector(tokens, w2v_model) for tokens in test
 # Save model and feature vector
 w2v_model.save("D:/Projects/Sentiment_Analysis/models/word2vec.model")
 print("✅ Word2Vec model saved as 'word2vec.model'")
-np.save("D:/Projects/Sentiment_Analysis/data/features/Word2Vec/X_train_w2v.npy", X_train_w2v)
-np.save("D:/Projects/Sentiment_Analysis/data/features/Word2Vec/X_dev_w2v.npy", X_dev_w2v)
-np.save("D:/Projects/Sentiment_Analysis/data/features/Word2Vec/X_test_w2v.npy", X_test_w2v)
+joblib.dump(train_df["sentiment"].values, "D:/Projects/Sentiment_Analysis/models/Word2Vec/y_train.pkl")
+joblib.dump(dev_df["sentiment"].values, "D:/Projects/Sentiment_Analysis/models/Word2Vec/y_dev.pkl")
+joblib.dump(test_df["sentiment"].values, "D:/Projects/Sentiment_Analysis/models/Word2Vec/y_test.pkl")
+
+# Lưu ma trận TF-IDF dạng nén (nếu muốn)
+np.savez_compressed("D:/Projects/Sentiment_Analysis/data/features/Word2Vec/X_train_w2v.npz", X_train_w2v)
+np.savez_compressed("D:/Projects/Sentiment_Analysis/data/features/Word2Vec/X_dev_w2v.npz", X_dev_w2v)
+np.savez_compressed("D:/Projects/Sentiment_Analysis/data/features/Word2Vec/X_test_w2v.npz", X_test_w2v)
 
 print("✅ Saved vectorized data: X_train_w2v.npy, X_dev_w2v.npy, X_test_w2v.npy")
