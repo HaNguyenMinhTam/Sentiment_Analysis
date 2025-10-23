@@ -6,31 +6,23 @@ import os
 
 def clean_text(text):
     """
-    Làm sạch văn bản:
-    - Chuyển về chữ thường
-    - Xóa URL
-    - Xóa ký tự đặc biệt
-    - Xóa khoảng trắng thừa
+    Clean up text:
+        - Unicode standardization (NFC)
+        - Move to normal
+        - Remove URL
+        - Remove special characters not in the Vietnamese alphabet
+        - Remove spaces
     """
     text = str(text).lower()
+    text = unicodedata.normalize('NFC', text)
     text = re.sub(r"http\S+|www\S+|https\S+", '', text)
-    text = re.sub(r"[^a-zA-Z0-9àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễ"
-                  r"ìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ\s]", '', text)
+    text = re.sub(r"[^0-9a-zA-ZÀ-Ỵà-ỵĐđ\s]", ' ', text)
     text = re.sub(r"\s+", " ", text).strip()
     return text
 
-
-def remove_vietnamese_accents(text):
-    """
-    Loại bỏ dấu tiếng Việt, chuyển 'đẹp quá' -> 'dep qua'
-    """
-    nfkd_form = unicodedata.normalize('NFKD', text)
-    return ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
-
-
 def remove_stopwords(text, stopwords):
     """
-    Loại bỏ từ dừng khỏi văn bản.
+    Remove stop words from the text, but keep the emotional/negative words removed from the stopwords.
     """
     words = text.split()
     filtered = [w for w in words if w not in stopwords]
@@ -39,33 +31,51 @@ def remove_stopwords(text, stopwords):
 
 def preprocess_datasets(train_path, test_path, dev_path, stopwords_path, save_dir):
     """
-    Áp dụng toàn bộ quá trình làm sạch, bỏ dấu và loại từ dừng cho 3 tập train/test/dev.
+    Apply cleaning pipeline to 3 train/test/dev sets.
     """
     # Load data
-    train_df = pd.read_csv("D:/Projects/Sentiment_Analysis/data/interim/train.csv")
-    test_df  = pd.read_csv("D:/Projects/Sentiment_Analysis/data/interim/test.csv")
-    dev_df   = pd.read_csv("D:/Projects/Sentiment_Analysis/data/interim/dev.csv")
+    train_df = pd.read_csv(train_path, encoding="utf-8-sig")
+    test_df  = pd.read_csv(test_path, encoding="utf-8-sig")
+    dev_df   = pd.read_csv(dev_path, encoding="utf-8-sig")
 
     # Load stopwords
     with open(stopwords_path, "r", encoding="utf-8") as f:
         stopwords = set(f.read().splitlines())
 
-    # Apply cleaning pipeline
+    # Remove some emotional and negative words from stopwords
+    emotion_words = [
+        # Negation, degree
+        "không", "chẳng", "chả", "chưa", "đầy", "đủ", "rất", "hơi", "khá", "cực", "quá",
+        "vô cùng", "hết sức", "cực kỳ", "siêu", "vô đối", "tương đối",
+        # Positive
+        "tốt", "đẹp", "hay", "tuyệt", "xuất sắc", "đỉnh", "ổn", "vui", "ưng", "dễ thương", "đáng yêu",
+        "mượt", "chất lượng", "ấn tượng", "hiệu quả", "thích", "hấp dẫn", "hoàn hảo", "đáng tin",
+        "đáng giá", "chuẩn", "xịn", "tuyệt vời", "ổn áp", "ngon", "ngon lành", "ok", "oke",
+        # Negative
+        "tệ", "xấu", "kém", "chán", "ghét", "bực", "dở", "tồi", "khó chịu", "kinh khủng",
+        "thất vọng", "chậm", "lỗi", "rác", "ngu", "bực mình", "quá đáng", "bực tức", "dở ẹc",
+        "chán đời", "kệch cỡm", "vô dụng", "phiền", "tồi tệ", "dở dang"
+    ]
+    for w in emotion_words:
+        stopwords.discard(w)
+
+    # Apply pipeline processing
     for df in [train_df, test_df, dev_df]:
         df["sentence"] = df["sentence"].apply(clean_text)
-        df["sentence"] = df["sentence"].apply(remove_vietnamese_accents)
         df["sentence"] = df["sentence"].apply(lambda x: remove_stopwords(x, stopwords))
 
+    # Create a folder to save the results
     os.makedirs(save_dir, exist_ok=True)
 
-    # Save processed files
-    train_df.to_csv(os.path.join(save_dir, "train_clean.csv"), index=False)
-    test_df.to_csv(os.path.join(save_dir, "test_clean.csv"), index=False)
-    dev_df.to_csv(os.path.join(save_dir, "dev_clean.csv"), index=False)
+    # Save the result file
+    train_df.to_csv(os.path.join(save_dir, "train_clean.csv"), index=False, encoding="utf-8-sig")
+    test_df.to_csv(os.path.join(save_dir, "test_clean.csv"), index=False, encoding="utf-8-sig")
+    dev_df.to_csv(os.path.join(save_dir, "dev_clean.csv"), index=False, encoding="utf-8-sig")
 
-    print(" Đã xử lý và lưu dữ liệu vào:", save_dir)
+    print("✅ Đã xử lý và lưu dữ liệu vào:", save_dir)
+
+
 if __name__ == "__main__":
-    # Khai báo đường dẫn input/output
     base_dir = "D:/Projects/Sentiment_Analysis/data"
     train_path = os.path.join(base_dir, "interim/train.csv")
     test_path = os.path.join(base_dir, "interim/test.csv")
@@ -73,5 +83,4 @@ if __name__ == "__main__":
     stopwords_path = os.path.join(base_dir, "external/vietnamese-stopwords.txt")
     save_dir = os.path.join(base_dir, "processed")
 
-    # Gọi pipeline
     preprocess_datasets(train_path, test_path, dev_path, stopwords_path, save_dir)
