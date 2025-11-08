@@ -10,3 +10,4 @@ src/features/.ipynb_checkpoints/build_word2vec_features-checkpoint.py
 notebooks/.ipynb_checkpoints/05_PhoBERT_performs-checkpoint.ipynb
 notebooks/.ipynb_checkpoints/TF-IDF_with_LR-checkpoint.ipynb
 src/features/.ipynb_checkpoints/build_phobert_features-checkpoint.py
+/notebooks/.ipynb_checkpoints
